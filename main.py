@@ -23,7 +23,7 @@ from telegram.ext import (
 )
 
 # ------- CONFIG (from environment) -------
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # mandatory
+TELEGRAM_TOKEN = os.environ.get("7996853188:AAHCJLt_eG8EHgmsKIFWJXTfTUoRc8pIvkE")  # mandatory
 TARGET_CHAT = os.environ.get("5891731303")       # channel username or id (e.g. @yourchannel)
 POST_INTERVAL_MINUTES = int(os.environ.get("POST_INTERVAL_MINUTES", "30"))
 ADMIN_IDS = os.environ.get("ADMIN_IDS", "")       # optional: comma-separated Telegram user ids
