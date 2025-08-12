@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: telegram-mcq-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: TELEGRAM_TOKEN
+        value: YOUR_BOT_TOKEN_HERE
+      - key: ADMIN_CHAT_ID
+        value: YOUR_CHAT_ID_HERE
+      - key: RENDER
+        value: true
