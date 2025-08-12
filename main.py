@@ -5,15 +5,23 @@ import json
 import threading
 import time
 from datetime import datetime, time as dtime
+from pathlib import Path
+from flask import Flask
+
+# Initialize Flask app for Render health check
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "MCQ Quiz Bot is running", 200
 
 # Bot configuration
-TOKEN = os.getenv('TELEGRAM_TOKEN')  # Get from environment variables
-ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID')  # Get from environment variables
-QUESTIONS_FILE = "questions.json"
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID')
+QUESTIONS_FILE = os.path.join(Path(__file__).parent, "questions.json")
 SCHEDULE_START = 8  # 8 AM
 SCHEDULE_END = 20   # 8 PM
 
-# [Rest of the code remains exactly the same as in the previous version]
 # Load or initialize questions
 def load_questions():
     try:
@@ -113,7 +121,7 @@ def post_next_question(bot):
     
     try:
         message = bot.send_poll(
-            chat_id=ADMIN_CHAT_ID,  # Change to your channel/group ID if needed
+            chat_id=ADMIN_CHAT_ID,
             question=question["text"],
             options=question["options"],
             type=Poll.QUIZ,
@@ -126,16 +134,22 @@ def post_next_question(bot):
         save_questions(questions)
     except Exception as e:
         print(f"Error posting question: {e}")
-        questions["pending"].insert(0, question)  # Put it back if failed
+        questions["pending"].insert(0, question)
         save_questions(questions)
 
 def scheduled_posting(context: CallbackContext):
     now = datetime.now().time()
-    # Only post between scheduled hours
     if SCHEDULE_START <= now.hour < SCHEDULE_END:
         post_next_question(context.bot)
 
+def run_flask():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 def main():
+    # Start Flask server in a separate thread for Render
+    if os.getenv('RENDER'):
+        threading.Thread(target=run_flask, daemon=True).start()
+
     # Create the Updater and pass it your bot's token.
     updater = Updater(TOKEN)
 
@@ -153,12 +167,10 @@ def main():
 
     # Start scheduled posting
     job_queue = updater.job_queue
-    job_queue.run_repeating(scheduled_posting, interval=60, first=0)  # Every 60 seconds
+    job_queue.run_repeating(scheduled_posting, interval=60, first=0)
 
     # Start the Bot
     updater.start_polling()
-
-    # Run the bot until you press Ctrl-C
     updater.idle()
 
 if __name__ == '__main__':
