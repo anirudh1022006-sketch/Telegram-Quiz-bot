@@ -1,3 +1,14 @@
+# Node.js dependencies
 node_modules/
-mcq_store.json
+npm-debug.log
+yarn-error.log
+
+# Local env files
 .env
+
+# Database
+mcq_store.json
+
+# OS files
+.DS_Store
+Thumbs.db
