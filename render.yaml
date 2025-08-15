@@ -2,12 +2,15 @@ services:
   - type: web
     name: telegram-mcq-bot
     env: node
-    buildCommand: "npm install"
-    startCommand: "node bot.js"
     plan: free
-    autoDeploy: true
+    buildCommand: "npm install"
+    startCommand: "npm start"
     envVars:
       - key: BOT_TOKEN
         sync: false
       - key: TARGET_CHAT_ID
         sync: false
+      - key: DISCUSSION_GROUP_ID
+        sync: false
+      - key: DB_PATH
+        value: mcq_store.json
